@@ -139,20 +139,6 @@ for line in range(0,len(review)):
     print(str(review[line]) +'\t'+ str(dates[line])+'\t'+str(label[line])+'\n')
 fw.close()
 
-def remove_pattern(text, pattern_regex):
-    r = re.findall(pattern_regex, text)
-    for i in r:
-        text = re.sub(i, '', text)
-        text=text.str.replace(("[^a-zA-Z]", ""))
-    
-    return text
-remove_pattern(review[i],"@[\w]*: | *RT*...#").lower()
-
-from nltk.stem import WordNetLemmatizer
-lemmatizer = WordNetLemmatizer()
-def lemmas(text):
-    return lemmatizer.lemmatize(text)
-
 
 
 
