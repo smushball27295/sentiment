@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from selenium import webdriver
 import time,codecs
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
