@@ -10,12 +10,20 @@ from nltk.stem import LancasterStemmer, WordNetLemmatizer
 from emot.emo_unicode import UNICODE_EMO, EMOTICONS
 import csv
 import time
+import sys
 from datetime import datetime
 from datetime import timedelta
 import dateutil.parser as dp
 from textblob import TextBlob
 import string
 
+def timer(name):
+    if name in timer.timers:
+        print("{} took {} seconds".format(name, (time.time() - timer.timers[name])))
+        del timer.timers[name]
+    else:
+        timer.timers[name] = time.time()
+timer.timers = {}
 
 def getTweetId(dt):
     msepoch = int(dt.timestamp() * 1000)
@@ -34,7 +42,7 @@ def convert_emot(text):
     return text
 
 def cleanup(text):
-
+    timer("cleanup")
     # conver emoticons to words
     text = convert_emot(text)
 
@@ -68,34 +76,19 @@ def cleanup(text):
     # split attached words
     #text = ' '.join(re.findall('[A-Z][^A-Z]*', text))
 
-    # ntlk word processing
-    text_tokens = word_tokenize(text)
-    # remove stop words
-    text_tokens = [word for word in text_tokens if not word in stopwords.words()]
-    # stemming
-    stemmer = LancasterStemmer()
-    text_tokens = [stemmer.stem(word) for word in text_tokens]
-    # lemmatizing
-    lemmatizer = WordNetLemmatizer()
-    text = ' '.join(lemmatizer.lemmatize(word) for word in text_tokens)
-
     # make lowercase
     text = text.lower()
-
-    # wrap text in quotes
-    quote=re.compile(r'"')
-    comma=re.compile(r',')
-    if re.search(comma, text) is not None:
-        # replace existing double quotes with single qoutes
-        (text, n) = quote.subn("'", text)
-        text = '"'+text+'"'
-
+    timer("cleanup")
     return text
 
-def getSentiment(text):
+
+def getPolarity(text):
     # correct spelling
+    timer("polarity")
     text = TextBlob(text).correct()
-    return text.sentiment.polarity
+    polarity = text.sentiment.polarity
+    timer("polarity")
+    return polarity
 
 def getTweets(query):
     tweetCriteria = got.manager.TweetCriteria() \
@@ -106,6 +99,7 @@ def getTweets(query):
     tweets = []
     delay  = 1
 
+    timer("query")
     failed = True
     while failed:
         failed = False
@@ -117,6 +111,9 @@ def getTweets(query):
             time.sleep(delay)
             delay *= 2
 
+    timer("query")
+    timer("process")
+
     for tweet in tweets:
         clean_text = cleanup(tweet.text)
         if len(clean_text) >= 4:
@@ -124,40 +121,69 @@ def getTweets(query):
                     tweet.date, \
                     tweet.username, \
                     clean_text, \
-                    getSentiment(clean_text), \
+                    getPolarity(clean_text), \
+                    getMasterScore(clean_text), \
                     tweet.retweets, \
                     tweet.favorites \
- ]
+            ]
             rows.append(row)
+    timer("process")
 
     return rows
 
+def loadMasterDictionary():
+    filename = 'LoughranMcDonald_MasterDictionary_2018.csv'
+    master   = {}
+    with open(filename) as csvfile:
+        linereader = csv.reader(csvfile, delimiter=',')
+        linereader.__next__() # skip column names line
+        for row in linereader:
+            word = row[0].lower()
+            master[word] = 0
+            if (int(row[7]) > 0):
+                master[word] = -1
+            if (int(row[8]) > 0):
+                master[word] = 1
+    return master
+
+
+master = loadMasterDictionary()
+def getMasterScore(text):
+    timer("master")
+    score = 0
+    activewords = 0
+    words = word_tokenize(text)
+    for word in words:
+        if word in master.keys():
+            score += master[word]
+            if master[word] != 0:
+                activewords += 1
+    if activewords > 0:
+        score /= activewords
+    timer("master")
+    return score
 
 def main():
-    #nltk.download('words')
-
-    hours = 1;
-    #dt_start = dp.parse(sys.argv[1])
-    dt_start = dp.parse("05/08/2020 08:00:00")
-    #coin = sys.argv[2]
-    search = "bitcoin"
+    hours = 24;
+    dt_start = dp.parse(sys.argv[1])
+    #dt_start = dp.parse("05/08/2020 08:00:00")
+    search = sys.argv[2] # "bitcoin"
     id_start = getTweetId(dt_start)
 
     filename = "./output.csv"        
     fields = ["Tweet Id", "Tweet Date", "Username", "Text",\
-              "Polarity", "Retweets", "Favorites"]
+                "TextBlob", "MasterDict", "Retweets", "Favorites"]
     with open(filename, 'w+') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(fields)
 
-        for i in range(2):
-        #for i in range(12 * hours):
+        #for i in range(2):
+        for i in range(12 * hours):
             dt_end = dt_start + timedelta(minutes=5)
             id_end = getTweetId(dt_end)
 
             rows = getTweets(getQuery(id_start, id_end, search))
             writer.writerows(rows)
-
             dt_start = dt_end
             id_start = id_end
 
