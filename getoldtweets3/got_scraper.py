@@ -16,8 +16,10 @@ from datetime import timedelta
 import dateutil.parser as dp
 from textblob import TextBlob
 import string
+import multiprocessing as mp
 
 def timer(name):
+    return
     if name in timer.timers:
         print("{} took {} seconds".format(name, (time.time() - timer.timers[name])))
         del timer.timers[name]
@@ -163,29 +165,70 @@ def getMasterScore(text):
     timer("master")
     return score
 
+
+def writer(resultQueue):
+    filename = "./output.csv"
+    fields = ["Tweet Id", "Tweet Date", "Username", "Text",\
+                "TextBlob", "MasterDict", "Retweets", "Favorites"]
+    resultDict = {}
+    nextItem = 0
+    with open(filename, 'w+') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(fields)
+        res = resultQueue.get()
+        while (not (res == 'stop' and len(resultDict) == 0)):
+            while res == 'stop':
+                res = resultQueue.get()
+                resultQueue.put('stop')
+            resultDict[res[0]] = res[1]
+            wrote = False
+            while nextItem in resultDict:
+                writer.writerows(resultDict[nextItem])
+                del resultDict[nextItem]
+                print("wrote ", nextItem)
+                nextItem += 1
+                wrote = True
+            if wrote:
+                csvfile.flush()
+            res = resultQueue.get()
+
+def worker(w, resultQueue):
+    rows = getTweets(w[1])
+    resultQueue.put((w[0], rows))
+
 def main():
+    # start the manager / forked processes
+    manager = mp.Manager()
+    resultQueue = manager.Queue()
+    pool = mp.Pool(10)
+    writeProc = pool.apply_async(writer, (resultQueue,))
+
     hours = 24;
     dt_start = dp.parse(sys.argv[1])
     #dt_start = dp.parse("05/08/2020 08:00:00")
     search = sys.argv[2] # "bitcoin"
     id_start = getTweetId(dt_start)
 
-    filename = "./output.csv"        
-    fields = ["Tweet Id", "Tweet Date", "Username", "Text",\
-                "TextBlob", "MasterDict", "Retweets", "Favorites"]
-    with open(filename, 'w+') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(fields)
+    jobs = []
+    #for i in range(2):
+    for i in range(12 * hours):
+        dt_end = dt_start + timedelta(minutes=5)
+        id_end = getTweetId(dt_end)
+        work = (i, getQuery(id_start, id_end, search))
+        job = pool.apply_async(worker, (work, resultQueue))
+        jobs.append(job)
+        #rows = getTweets(getQuery(id_start, id_end, search))
+        dt_start = dt_end
+        id_start = id_end
 
-        #for i in range(2):
-        for i in range(12 * hours):
-            dt_end = dt_start + timedelta(minutes=5)
-            id_end = getTweetId(dt_end)
-
-            rows = getTweets(getQuery(id_start, id_end, search))
-            writer.writerows(rows)
-            dt_start = dt_end
-            id_start = id_end
+    # wait for the workers to finish
+    for job in jobs:
+        job.get()
+    # stop the writer
+    resultQueue.put('stop')
+    writeProc.get()
+    pool.close()
+    pool.join()
 
 
 if __name__ == "__main__":
@@ -200,4 +243,5 @@ if __name__ == "__main__":
 # https://towardsdatascience.com/twitter-sentiment-analysis-using-fasttext-9ccd04465597
 # https://gist.github.com/MrEliptik/b3f16179aa2f530781ef8ca9a16499af
 # https://www.analyticsvidhya.com/blog/2014/11/text-data-cleaning-steps-python/
-
+# multiprocessing:
+# https://stackoverflow.com/questions/13446445/python-multiprocessing-safely-writing-to-a-file
