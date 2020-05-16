@@ -6,7 +6,7 @@ import re
 from nltk.stem import WordNetLemmatizer
 import string
 
-
+# references: https://selenium-python.readthedocs.io
 # ===============================================================================================
 # do simple sentiment Text Blob
 # ===============================================================================================
@@ -17,8 +17,6 @@ def fetch_sentiment_using_textblob(text):
         return 1
     else:
         return 0
-
-
 # ===============================================================================================
 # simple sentiment NLTK
 # ===============================================================================================
@@ -29,8 +27,6 @@ def fetch_sentiment_using_SIA(text):
         return 0
     else:
         return 1
-
-
 # =============================================================================================== reference:
 # https://stackoverflow.com/questions/8376691/how-to-remove-hashtag-user-link-of-a-tweet-using-regular-expression
 # ===============================================================================================
@@ -42,8 +38,6 @@ def strip_links(text):
     for link in links:
         text = text.replace(link[0], ", ")
     return text
-
-
 # ===============================================================================================
 def strip_all_entities(text):
     entity_prefixes = ["@", "#"]
@@ -57,8 +51,6 @@ def strip_all_entities(text):
             if word[0] not in entity_prefixes:
                 words.append(word)
     return " ".join(words)
-
-
 # ===============================================================================================
 # remove_pattern
 # ===============================================================================================
@@ -68,16 +60,12 @@ def remove_pattern(text, pattern_regex):
         text = re.sub(i, "", text)
         text = text.str.replace(("[^a-zA-Z]", ""))
     return text
-
-
 # ===============================================================================================
 # lemmatizer
 # ===============================================================================================
 def lemmas(text):
     lemmatizer = WordNetLemmatizer()
     return lemmatizer.lemmatize(text)
-
-
 # ===============================================================================================
 # get data with selenium
 # ===============================================================================================
@@ -96,10 +84,10 @@ def run(actname, count):
     fw = codecs.open("opinion_mining.txt", "w", encoding="utf8")
 
     for i in range(count):
-        print(i)
+        
         # find all elements that have the value "tweet" for the data-testid attribute
         tweets = driver.find_elements_by_css_selector('div[data-testid="tweet"]')  #
-        print(len(tweets))
+        
         for tweet in tweets:
             if tweet in already_seen:
                 continue  # we have seen this tweet before while scrolling down, ignore
@@ -138,7 +126,6 @@ def run(actname, count):
                     "div.css-1dbjc4n.r-18u37iz.r-1wtj0ep.r-156q2ks.r-1mdbhws"
                 )
                 data = dataElement.text.split()
-                print(data)
                 comments = data[0]
                 likes = data[2]
             except:
@@ -150,7 +137,7 @@ def run(actname, count):
             except:
                 print("no date")
 
-            # only write tweets that have text or retweets (or both).
+            # write name + tweets + date
             if txt != "NA" or retweets != "NA":
                 fw.write(
                     str(actname)
@@ -168,8 +155,6 @@ def run(actname, count):
 
     fw.close()
     driver.close()
-
-
 # ===============================================================================================
 # loadData = list [name,date,sentiment]
 # ===============================================================================================
@@ -200,8 +185,6 @@ def loadData(fname):
 
     f.close()
     return actname, reviews_clean, date, label
-
-
 # ===============================================================================================
 # name + comment + date + label = new text file to be used for training classifier
 # ===============================================================================================
@@ -226,8 +209,6 @@ def loadFinal(file):
         )
     fw.close()
     return fw
-
-
 # ===============================================================================================
 if __name__ == "__main__":
     run("elerianm", 1000)

@@ -6,10 +6,7 @@ import numpy as np
 import pickle
 from sklearn.pipeline import Pipeline
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.ensemble import VotingClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_extraction.text import (
     CountVectorizer,
     TfidfTransformer,
@@ -23,24 +20,22 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score
 from scipy import stats
 from sklearn.model_selection import cross_val_score
-from sklearn.tree import DecisionTreeClassifier
-from scipy import stats
 from nltk.stem.porter import PorterStemmer
 
 start_time = time.time()
+stop = stopwords.words("english")
+
+tfidf = TfidfVectorizer()
+cvec = CountVectorizer()
 
 # reference: Python Machnine Learning by Sebastian Raschika
 # ===========================================================================================
 def tokenizer(text):
     return text.split()
-
-
 # ===========================================================================================
 def tokenzier_porter(text):
     porter = PorterStemmer()
     return [porter.stem(words) for words in text.split()]
-
-
 # ===========================================================================================
 def load_label_data(fname):
     actname = []
@@ -59,8 +54,6 @@ def load_label_data(fname):
 
     f.close()
     return actname, reviews, date, labels
-
-
 # ==================================================================================================
 def balance_labels(file):
 
@@ -82,16 +75,6 @@ def balance_labels(file):
         )
 
     return rev_train, labels_train, rev_test, labels_test
-
-
-# ==================================================================================================
-print(stats.itemfreq(labels_train))
-print(stats.itemfreq(labels_test))
-
-stop = stopwords.words("english")
-
-tfidf = TfidfVectorizer()
-cvec = CountVectorizer()
 # ==================================================================================================
 # LREG
 # ==================================================================================================
@@ -131,8 +114,6 @@ def lreg(rev_train, labels_train, rev_test, labels_test):
     predictedLREG_BEST = lreg_clfgs_best.predict(rev_test)
 
     return predictedLREG_BEST
-
-
 # ==================================================================================================
 # NB
 # ==================================================================================================
@@ -169,8 +150,6 @@ def nb(rev_train, labels_train, rev_test, labels_test):
     predictedNB_BEST = gridsearch_nb_best.predict(rev_test)
 
     return predictedNB_BEST
-
-
 # ==================================================================================================
 if __name__ == "__main__":
 
