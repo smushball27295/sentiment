@@ -14,9 +14,9 @@ import SentimentIntensityAnalyzer
 import os
 import json
 
-abspath = os.path.abspath(__file__)
-dname = os.path.dirname(abspath)
-os.chdir(dname)
+#abspath = os.path.abspath(__file__)
+#dname = os.path.dirname(abspath)
+#os.chdir(dname)
 
 # Twitter Authentication
 
@@ -56,13 +56,25 @@ search_term = search_term + ' -filter:retweets'
 Econ_Tweets  = pd.read_csv("Sentiment_Tweets.csv", index_col = False)
 
 current_time = datetime.now(timezone('UTC')).replace(tzinfo= None) # Current time of scraping
-
+    
 # Identify tweets that are greater than 24 hours
 
 Tweet_times = list(Econ_Tweets['Tweet Time'])
 
 times = [i for i in range(len(Tweet_times)) if 
-         (current_time - datetime.strptime(Tweet_times[i],'%Y-%m-%d %H:%M:%S')).total_seconds()/3600 > 24]
+         (current_time - datetime.strptime(Tweet_times[0],'%Y-%m-%d %H:%M:%S')).total_seconds()/3600 > 24]
+
+ids_s = Econ_Tweets['id'].nsmallest(500+len(times))
+
+ids_ind = [Econ_Tweets.index[Econ_Tweets['id'] == i][0] for i in ids_s] 
+
+if len(times) < 500:
+    for i in ids_ind:
+        if i not in times:
+            times.append(i)
+        if len(times) == 500:
+            break
+    
 
 # Remove identified rows from df
 Econ_Tweets = Econ_Tweets.drop(times) # Re
@@ -96,21 +108,20 @@ while tweetCount < maxTweets:
         public_tweets = api.search(q = search_term, count = tweet_reqd, lang = "en", 
                                    geocode = "39.809879,-98.556732,1340mi", result_type = "Popular")
         
-        sleep(2)
-           
+        print("1")   
     else:
         public_tweets = api.search(q = search_term, count = tweet_reqd, lang = "en", 
                                    geocode = "39.809879,-98.556732,1340mi", result_type = "Popular", 
-                                   since_id = str(sinceId))
+                                   since_id = sinceId)
         
-        sleep(2)
+        print("2")
         
         if len(public_tweets) == 0:
             public_tweets = api.search(q = search_term, count = tweet_reqd, lang = "en", 
                                        geocode = "39.809879,-98.556732,1340mi", result_type = "Popular", 
-                                       max_id = str(maxId))
+                                       max_id = maxId-1)
             
-            sleep(2)
+            print("3")
             
             check_time = [tweet.id for tweet in public_tweets if 
                        (current_time - tweet.created_at).total_seconds()/3600 <= 24]
@@ -143,23 +154,33 @@ while tweetCount < maxTweets:
             sent_score = sentiment_analysis(text)
             
             Econ_Tweets = Econ_Tweets.append({'User Name' : user_name, 'Tweet' : text, 
-                                                  'Tweet Time' : posted_time, 'RTs count' : rt_count, 
-                                                  'Likes count' : fav_count, 'id' : T_id, 
-                                                  'Sentiment Score' : sent_score}, ignore_index=True)
+                                                      'Tweet Time' : posted_time, 'RTs count' : rt_count, 
+                                                      'Likes count' : fav_count, 'id' : T_id, 
+                                                      'Sentiment Score' : sent_score}, ignore_index=True)
+        
+    sinceId = max([int(id) for id in Econ_Tweets['id']])
+    print(sinceId)
+    maxId = min([int(id) for id in Econ_Tweets['id']])
+    print(maxId)
     
-    sinceId = max(Econ_Tweets['id'])
-    maxId = min(Econ_Tweets['id'])
-                        
+    sleep(4)
+                    
     elapsed_time = time() - start_time
     
-    if elapsed_time > 3600:
+    if elapsed_time > 1800:
         print ("time over")
         break
     
+    if tweetCount >= maxTweets:
+        print("Required number of tweets obtained")
+    
     print("Downloaded {0} tweets".format(tweetCount) + " On the {0} try".format(twitter_runs) + 
           " after {0}".format(elapsed_time))
-                    
-tweet_post_sent = [Econ_Tweets.iloc[i,6] for i in range(Econ_Tweets.shape[0]) if Econ_Tweets.iloc[i,6] >= 0]    
+
+
+# Removing Duplicates
+    
+Econ_Tweets = Econ_Tweets.drop_duplicates('id')
 
 weighted_sent = []
 for i in range(Econ_Tweets.shape[0]):
@@ -171,14 +192,16 @@ for i in range(Econ_Tweets.shape[0]):
         weighted_sent.append((0.75*Econ_Tweets.iloc[i,4])*Econ_Tweets.iloc[i,6])
     else:
         weighted_sent.append(Econ_Tweets.iloc[i,6])
-    
+        
 tweet_post_sent = [weighted_sent[i] for i in range(len(weighted_sent)) if weighted_sent[i] >= 0]    
 tweet_neg_sent = [weighted_sent[i] for i in range(len(weighted_sent)) if weighted_sent[i] < 0]        
+    
+post_percent = round(sum(tweet_post_sent)/(sum(tweet_post_sent)-sum(tweet_neg_sent))*100,2)
+neg_percent = round(-sum(tweet_neg_sent)/(sum(tweet_post_sent)-sum(tweet_neg_sent))*100,2)
 
-post_percent = sum(tweet_post_sent)/(sum(tweet_post_sent)-sum(tweet_neg_sent))*100
-neg_percent = -sum(tweet_neg_sent)/(sum(tweet_post_sent)-sum(tweet_neg_sent))*100
+last_up = current_time.isoformat()
+last_up = last_up[:-7].replace('T', ' ') + " GMT"
 
-print(post_percent)
-print(neg_percent)
-
+tweets_analyzed = Econ_Tweets.shape[0]
+       
 Econ_Tweets.to_csv("Sentiment_Tweets.csv", index = False)
