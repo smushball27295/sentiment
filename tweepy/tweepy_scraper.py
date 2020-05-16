@@ -182,6 +182,7 @@ while tweetCount < maxTweets:
     
 Econ_Tweets = Econ_Tweets.drop_duplicates('id')
 
+# Computing Sentiment Score
 weighted_sent = []
 for i in range(Econ_Tweets.shape[0]):
     if Econ_Tweets.iloc[i,3] > 0 and Econ_Tweets.iloc[i,4] > 0:
