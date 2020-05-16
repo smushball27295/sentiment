@@ -5,6 +5,8 @@ from textblob import TextBlob
 import re
 from nltk.stem import WordNetLemmatizer
 import string
+
+# references: https://selenium-python.readthedocs.io
 # ===============================================================================================
 # do simple sentiment Text Blob
 # ===============================================================================================
