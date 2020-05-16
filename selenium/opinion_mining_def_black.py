@@ -96,10 +96,10 @@ def run(actname, count):
     fw = codecs.open("opinion_mining.txt", "w", encoding="utf8")
 
     for i in range(count):
-        print(i)
+        
         # find all elements that have the value "tweet" for the data-testid attribute
         tweets = driver.find_elements_by_css_selector('div[data-testid="tweet"]')  #
-        print(len(tweets))
+        
         for tweet in tweets:
             if tweet in already_seen:
                 continue  # we have seen this tweet before while scrolling down, ignore
@@ -138,7 +138,6 @@ def run(actname, count):
                     "div.css-1dbjc4n.r-18u37iz.r-1wtj0ep.r-156q2ks.r-1mdbhws"
                 )
                 data = dataElement.text.split()
-                print(data)
                 comments = data[0]
                 likes = data[2]
             except:
@@ -150,7 +149,7 @@ def run(actname, count):
             except:
                 print("no date")
 
-            # only write tweets that have text or retweets (or both).
+            # write name + tweets + date
             if txt != "NA" or retweets != "NA":
                 fw.write(
                     str(actname)
