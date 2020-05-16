@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
+<body>
+
+<section>
+  <img src="/static/tweet_pic.png" height="500" width="100%">
+ </section>
+
+<!-- Website Heading -->
+<section class="w3-container w3-content w3-padding-16" style="max-width:1000px">
+  <h1 class="w3-wide w3-center"><b>FE 595 Project Summary</b></h1>
+  <p class="w3-opacity w3-center"><i>Twitter Data - Scraping, sentiment anaysis and modelling sentiments </i></p>
+  <p class="w3-justify"> Our objective was to explore different methods of obtaining tweet related data from twitter
+                        and to perform analysis on the same. We have used the following methods to obtain data from
+			twitter - Selenium, Tweepy and Old Tweets Libraries. </br>
+			</br>
+			We have further performed the following actions on the data scraped:
+			<ul class="w3-ul w3-left">
+    				<li>Part A - Built a twitter sentiment indicator of public opinion on the economy</li>
+    				<li>Part B - Built classification models to idenity sentiment of tweets</li>
+    				<li>Part C - Twitter Bitcoin Sentiment Analysis</li>
+  			</ul>			
+	</p>
+</section>
+
+<section class="w3-padding-16 w3-row-padding w3-center w3-light-grey">
+  <h2 class="w3-center w3-padding"><b>Part A - Twitter Economy Sentiment Indicator</b></h2>
+
+<table border = "1" class="w3-table" style="width:40%" align="center">
+	  <tr>
+  		  <th>Sentiment</th>
+ 		   <th style="text-align:center">Percentage</th>
+   	</tr>
+  	<tr>
+    		<td>Positive Sentiment</td>
+    		<td style="text-align:center"> {{twit_sent1}}% </td>
+    	</tr>
+  	<tr>
+    		<td>Negative Sentiment</td>
+    		<td style="text-align:center"> {{twit_sent2}}% </td>
+    	</tr>
+	</table>
+	
+	<font size = "-2">
+	Last Updated: {{time}} <br/>
+	Tweets Analyzed: {{tweets}} Tweets <br/>
+	</font>
+
+
+</section>
+
+
+<section class="w3-padding-16 w3-row-padding w3-center w3-Pale-Blue">
+  <h2 class="w3-center"><b>Part B - Classification models</b></h2>
+  <article class="w3-half">
+    <p><i>Naive Bayes Algorithm</i></p>
+
+<table border = "1" class="w3-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th style="text-align:center">precision</th>
+      <th style="text-align:center">recall</th>
+      <th style="text-align:center">f1-score</th>
+      <th style="text-align:center">support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th style="text-align:left">0</th>
+      <td style="text-align:center">0.754386</td>
+      <td style="text-align:center">0.430000</td>
+      <td style="text-align:center">0.547771</td>
+      <td style="text-align:center">100.000000</td>
+    </tr>
+    <tr>
+      <th style="text-align:left">1</th>
+      <td style="text-align:center">0.686813</td>
+      <td style="text-align:center">0.899281</td>
+      <td style="text-align:center">0.778816</td>
+      <td style="text-align:center">139.000000</td>
+    </tr>
+    <tr>
+      <th style="text-align:left">accuracy</th>
+      <td style="text-align:center">0.702929</td>
+      <td style="text-align:center">0.702929</td>
+      <td style="text-align:center">0.702929</td>
+      <td style="text-align:center">0.702929</td>
+    </tr>
+    <tr>
+      <th style="text-align:left">macro avg</th>
+      <td style="text-align:center">0.720600</td>
+      <td style="text-align:center">0.664640</td>
+      <td style="text-align:center">0.663293</td>
+      <td style="text-align:center">239.000000</td>
+    </tr>
+    <tr>
+      <th style="text-align:left">weighted avg</th>
+      <td style="text-align:center">0.715086</td>
+      <td style="text-align:center">0.702929</td>
+      <td style="text-align:center">0.682144</td>
+      <td style="text-align:center">239.000000</td>
+    </tr>
+  </tbody>
+</table>
+
+  </article>
+
+<article class="w3-half">
+    <p><i>Logistic Regression</i></p>
+  
+<table border="1" class="w3-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th style="text-align:center"></th>
+      <th style="text-align:center">precision</th>
+      <th style="text-align:center">recall</th>
+      <th style="text-align:center">f1-score</th>
+      <th style="text-align:center">support</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th style="text-align:left">0</th>
+      <td style="text-align:center">0.709677</td>
+      <td style="text-align:center">0.440000</td>
+      <td style="text-align:center">0.543210</td>
+      <td style="text-align:center">100.000000</td>
+    </tr>
+    <tr>
+      <th style="text-align:left">1</th>
+      <td style="text-align:center">0.683616</td>
+      <td style="text-align:center">0.870504</td>
+      <td style="text-align:center">0.765823</td>
+      <td style="text-align:center">139.000000</td>
+    </tr>
+    <tr>
+      <th style="text-align:left">accuracy</th>
+      <td style="text-align:center">0.690377</td>
+      <td style="text-align:center">0.690377</td>
+      <td style="text-align:center">0.690377</td>
+      <td style="text-align:center">0.690377</td>
+    </tr>
+    <tr>
+      <th style="text-align:left">macro avg</th>
+      <td style="text-align:center">0.696647</td>
+      <td style="text-align:center">0.655252</td>
+      <td style="text-align:center">0.654516</td>
+      <td style="text-align:center">239.000000</td>
+    </tr>
+    <tr>
+      <th style="text-align:left">weighted avg</th>
+      <td style="text-align:center">0.694520</td>
+      <td style="text-align:center">0.690377</td>
+      <td style="text-align:center">0.672679</td>
+      <td style="text-align:center">239.000000</td>
+    </tr>
+  </tbody>
+</table>
+
+
+</section>
+
+<section class="w3-padding-16 w3-row-padding-16 w3-center w3-light-grey">
+  <h2 class="w3-center"><b>Part C - Twitter Bitcoin Sentiment Analysis</b></h2>
+  <img src="/static/Asian_Call.png" height="500" width="50%" class="center">
+</section>
+
+
+<!-- Footer -->
+<footer class="w3-container w3-padding-16 w3-center w3-black w3-xlarge">
+  <p class="w3-medium">
+  <i>Powered by Group 9 Team Members (FE 595)</i>
+  </p>
+</footer>
+
+
+</body>
+</html>
