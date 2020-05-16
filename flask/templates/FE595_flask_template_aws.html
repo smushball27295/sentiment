@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
 <body>
 
+
+<!-- Website Title Picture -->
 <section>
   <img src="/static/tweet_pic.png" height="500" width="100%">
  </section>
@@ -12,22 +14,28 @@
 <!-- Website Heading -->
 <section class="w3-container w3-content w3-padding-16" style="max-width:1000px">
   <h1 class="w3-wide w3-center"><b>FE 595 Project Summary</b></h1>
-  <p class="w3-opacity w3-center"><i>Twitter Data - Scraping, sentiment anaysis and modelling sentiments </i></p>
+  <p class="w3-opacity w3-center"><i>Twitter Data - Scraping, sentiment analysis and modelling sentiments </i></p>
   <p class="w3-justify"> Our objective was to explore different methods of obtaining tweet related data from twitter
                         and to perform analysis on the same. We have used the following methods to obtain data from
 			twitter - Selenium, Tweepy and Old Tweets Libraries. </br>
 			</br>
 			We have further performed the following actions on the data scraped:
 			<ul class="w3-ul w3-left">
-    				<li>Part A - Built a twitter sentiment indicator of public opinion on the economy</li>
-    				<li>Part B - Built classification models to idenity sentiment of tweets</li>
-    				<li>Part C - Twitter Bitcoin Sentiment Analysis</li>
+    				<li>Part A - Built a twitter based sentiment indicator of public opinion on the economy (Keyword based)</li>
+    				<li>Part B - Built text classification models to identify sentiment of tweets (Opinion Mining)</li>
+    				<li>Part C - Tweet based Bitcoin Sentiment Analysis</li>
   			</ul>			
 	</p>
 </section>
 
-<section class="w3-padding-16 w3-row-padding w3-center w3-light-grey">
-  <h2 class="w3-center w3-padding"><b>Part A - Twitter Economy Sentiment Indicator</b></h2>
+<!-- First Article Section -->
+
+<section class="w3-padding-8 w3-row-padding w3-center w3-light-grey">
+  <h2 class="w3-center"><b>Part A - Twitter Economy Sentiment Indicator</b></h2>
+
+<p class="w3-justify w3-center w3-padding-8"> We have built a public opinion indicator about the US economy using tweets from the 
+past 24 hours.
+</p>
 
 <table border = "1" class="w3-table" style="width:40%" align="center">
 	  <tr>
@@ -50,13 +58,29 @@
 	</font>
 
 
+<p class="w3-justify"> <i> Currently the cap on tweets scraped is 10K, however, this can be scaled up later on. 
+Further, we can also look at setting up cronjobs to ensure that the sentiment and flask script is refreshed based 
+on fresh tweets every 6 or 12 hours. 
+</i></p>
+
 </section>
 
 
+<!-- Second Article Section -->
+
 <section class="w3-padding-16 w3-row-padding w3-center w3-Pale-Blue">
-  <h2 class="w3-center"><b>Part B - Classification models</b></h2>
+  <h2 class="w3-center"><b>Part B - Text Classification Model Ouput - Opinion Mining</b></h2>
+
+<p class="w3-justify w3-center"> The data scraped was labelled based on positive or negative sentiment and 
+classifier models were trained on the text to identify sentiment of tweet.
+</p>
+
+<p class="w3-justify w3-center"><i> Account used: elerianm </i></p>
+
+
   <article class="w3-half">
     <p><i>Naive Bayes Algorithm</i></p>
+
 
 <table border = "1" class="w3-table">
   <thead>
@@ -164,11 +188,18 @@
 
 </section>
 
+<!-- Third Article Section -->
+
 <section class="w3-padding-16 w3-row-padding-16 w3-center w3-light-grey">
   <h2 class="w3-center"><b>Part C - Twitter Bitcoin Sentiment Analysis</b></h2>
-  <img src="/static/Asian_Call.png" height="500" width="50%" class="center">
-</section>
 
+<p class="w3-justify w3-center w3-padding-8"> We scraped data relating to bitcoins and compared two methods 
+(textblob and financial word dictionary) in creating measure of daily sentiment bitcoin and analyzing the 
+movement of bitcoin sentiment towards the date of 3rd BTC halving.	
+</p>
+
+  <img src="/static/bitcoin.png" class="center">
+</section>
 
 <!-- Footer -->
 <footer class="w3-container w3-padding-16 w3-center w3-black w3-xlarge">
