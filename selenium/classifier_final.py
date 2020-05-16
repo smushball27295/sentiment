@@ -6,10 +6,7 @@ import numpy as np
 import pickle
 from sklearn.pipeline import Pipeline
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.ensemble import VotingClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_extraction.text import (
     CountVectorizer,
     TfidfTransformer,
@@ -23,8 +20,6 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score
 from scipy import stats
 from sklearn.model_selection import cross_val_score
-from sklearn.tree import DecisionTreeClassifier
-from scipy import stats
 from nltk.stem.porter import PorterStemmer
 
 start_time = time.time()
